@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">StoryApp</string>
+    <string name="selamat_datang">Welcome to StoryApp</string>
+    <string name="email" >Email</string>
+    <string name="masukkan_alamat_email" >Enter your email</string>
+    <string name="password" >Password</string>
+    <string name="enter_your_password" >Enter your password</string>
+    <string name="login" >Login</string>
+    <string name="daftar" >Didn\'t have an account? Sign Up</string>
+    <string name="enter_your_name">Enter your name</string>
+    <string name="name">Name</string>
+    <string name="HaveAccount">Already have an account? Login</string>
+    <string name="SignUp">Sign Up</string>
+    <string name="password_too_short">Min. 8 Character\n</string>
+    <string name="add_story">Add Story\n</string>
+    <string name="Details">Story details here</string>
+    <string name="user_name">Username\n</string>
+    <string name="image">Image</string>
+    <string name="description">description\n</string>
+    <string name="StoryApp">Story App\n</string>
+    <string name="logout">logout\n</string>
+    <string name="detail_story">Detail Story\n</string>
+    <string name="created_at">"Created at : "</string>
+    <string name="error_loading_story">Error\n</string>
+    <string name="unknown_date">Unknown Date</string>
+    <string name="unknown_time">Unknown Time\n</string>
+    <string name="add_description">Add description</string>
+    <string name="upload">Upload</string>
+
+
+</resources>

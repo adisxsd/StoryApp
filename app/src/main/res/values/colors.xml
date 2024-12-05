@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryLight">#78B3CE</color> <!-- Warna utama biru terang -->
+    <color name="secondaryLight">#5A94B2</color> <!-- Biru medium -->
+    <color name="tertiaryLight">#3F7B99</color> <!-- Biru tua -->
+    <color name="primaryContainer">#A5D3E5</color> <!-- Biru terang pucat -->
+    <color name="secondaryContainer">#C8E7F1</color> <!-- Biru muda -->
+    <color name="tertiaryContainer">#DFF3FA</color> <!-- Biru pastel -->
+    <color name="surfaceDim">#DDEFF6</color> <!-- Biru sangat terang -->
+    <color name="surface">#F4FBFE</color> <!-- Warna permukaan terang -->
+    <color name="surfaceBright">#FFFFFF</color> <!-- Putih -->
+    <color name="onSurface">#1C2A33</color> <!-- Warna teks biru gelap -->
+    <color name="onSurfaceVar">#2D4A56</color> <!-- Varian warna teks -->
+    <color name="outlined">#5D8EA6</color> <!-- Outline biru medium -->
+    <color name="outlinedVariant">#92BACC</color> <!-- Outline varian terang -->
+    <color name="error">#B3261E</color> <!-- Merah untuk error -->
+    <color name="errorContainer">#F9DEDC</color> <!-- Background error -->
+    <color name="onErrorContainer">#410E0B</color> <!-- Teks pada error -->
+    <color name="onError">#FFFFFF</color> <!-- Teks putih pada error -->
+    <color name="inverseSurface">#2A3D47</color> <!-- Permukaan invers -->
+    <color name="inverseOnSurface">#E1F4F8</color> <!-- Teks invers -->
+    <color name="inversePrimary">#296A85</color> <!-- Warna utama invers -->
+</resources>
