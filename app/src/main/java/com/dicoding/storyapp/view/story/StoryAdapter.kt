@@ -17,20 +17,17 @@ class StoryAdapter(listOf: List<Any>) : ListAdapter<ListStoryItem, StoryAdapter.
 
     private var onItemClickListener: ((ListStoryItem) -> Unit)? = null
 
-    // Mengatur listener untuk item klik
     fun setOnItemClickListener(listener: (ListStoryItem) -> Unit) {
         onItemClickListener = listener
     }
 
-    // Membuat ViewHolder
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_story, parent, false)
         return StoryViewHolder(view)
     }
 
-    // Mengikat data ke ViewHolder
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
-        val story = getItem(position) // Menggunakan getItem untuk mengambil item dari currentList
+        val story = getItem(position)
         story?.let {
             holder.bind(it)
             holder.itemView.setOnClickListener {
@@ -40,10 +37,8 @@ class StoryAdapter(listOf: List<Any>) : ListAdapter<ListStoryItem, StoryAdapter.
         }
     }
 
-    // Menggunakan currentList untuk menghitung jumlah item
     override fun getItemCount(): Int = currentList.size
 
-    // ViewHolder untuk item story
     class StoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val imageView: ImageView = itemView.findViewById(R.id.iv_item_photo)
         private val textName: TextView = itemView.findViewById(R.id.tv_item_name)
@@ -60,14 +55,13 @@ class StoryAdapter(listOf: List<Any>) : ListAdapter<ListStoryItem, StoryAdapter.
         }
     }
 
-    // DiffUtil callback untuk mendeteksi perubahan data
     class StoryDiffCallback : DiffUtil.ItemCallback<ListStoryItem>() {
         override fun areItemsTheSame(oldItem: ListStoryItem, newItem: ListStoryItem): Boolean {
-            return oldItem.id == newItem.id // Membandingkan berdasarkan ID
+            return oldItem.id == newItem.id
         }
 
         override fun areContentsTheSame(oldItem: ListStoryItem, newItem: ListStoryItem): Boolean {
-            return oldItem == newItem // Membandingkan konten
+            return oldItem == newItem
         }
     }
 }

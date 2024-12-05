@@ -2,12 +2,16 @@ package com.dicoding.storyapp.utils
 
 import android.content.Context
 import android.text.TextUtils
-import android.widget.Toast
 import com.dicoding.storyapp.R
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
-// Fungsi ekstensi untuk format tanggal dari ISO ke format lokal
 fun Context.formatDateFromIso(isoDate: String?): String {
     if (isoDate.isNullOrEmpty()) return this.getString(R.string.unknown_date)
     val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
@@ -21,7 +25,6 @@ fun Context.formatDateFromIso(isoDate: String?): String {
     }
 }
 
-// Fungsi ekstensi untuk format waktu lokal dari UTC
 fun Context.formatTimeToLocal(utcTime: String?, outputFormat: String = "HH:mm:ss"): String {
     if (utcTime.isNullOrEmpty()) return this.getString(R.string.unknown_time)
     val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
@@ -35,13 +38,19 @@ fun Context.formatTimeToLocal(utcTime: String?, outputFormat: String = "HH:mm:ss
     }
 }
 
-// Fungsi untuk validasi email
 fun isValidEmail(email: String?): Boolean {
     return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 }
 
-
-// Fungsi untuk menghindari null pada list
 fun <T> safeList(list: List<T?>?): List<T> {
     return list?.filterNotNull() ?: emptyList()
+}
+
+fun prepareFilePart(partName: String, file: File): MultipartBody.Part {
+    val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
+    return MultipartBody.Part.createFormData(partName, file.name, requestFile)
+}
+
+fun createRequestBody(data: String): RequestBody {
+    return RequestBody.create("text/plain".toMediaTypeOrNull(), data)
 }

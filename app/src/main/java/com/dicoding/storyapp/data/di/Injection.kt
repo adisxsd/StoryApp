@@ -1,4 +1,4 @@
-package com.dicoding.storyapp.di
+package com.dicoding.storyapp.data.di
 
 import android.content.Context
 import com.dicoding.storyapp.data.local.UserPreference
@@ -8,19 +8,18 @@ import com.dicoding.storyapp.data.repository.UserRepository
 
 object Injection {
 
-    // Provide UserRepository
     fun provideRepository(context: Context): UserRepository {
         val pref = UserPreference(context)
 
         val apiService = ApiConfig.getApiService()
 
-        return UserRepository(apiService, pref)  // Return UserRepository with ApiService and UserPreference
+        return UserRepository(apiService, pref)
     }
 
     fun provideStoryRepository(context: Context): StoryRepository {
-        val userRepository = provideRepository(context)  // Get UserRepository for token
-        val apiService = ApiConfig.getApiService()  // API service without token here
-        return StoryRepository(apiService)  // Return StoryRepository
+        val userRepository = provideRepository(context)
+        val apiService = ApiConfig.getApiService()
+        return StoryRepository(apiService)
     }
 
 }

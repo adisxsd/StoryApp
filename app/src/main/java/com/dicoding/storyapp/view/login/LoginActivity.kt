@@ -1,5 +1,7 @@
 package com.dicoding.storyapp.view.login
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -17,8 +19,6 @@ import com.dicoding.storyapp.view.loginregister.RegisterActivity
 import com.dicoding.storyapp.view.story.MainActivity
 import com.dicoding.storyapp.viewmodel.ViewModelFactory
 import kotlinx.coroutines.launch
-import android.animation.ObjectAnimator
-import android.animation.AnimatorSet
 
 class LoginActivity : AppCompatActivity() {
 
@@ -42,10 +42,8 @@ class LoginActivity : AppCompatActivity() {
         edPassword = findViewById(R.id.ed_login_password)
         progressBar = findViewById(R.id.progressBar)
 
-        // Animasi untuk tombol login
         animateButton()
 
-        // Animasi untuk progress bar
         animateProgressBar()
 
         btnLogin.setOnClickListener {
@@ -103,7 +101,6 @@ class LoginActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    // Animasi untuk tombol login saat klik
     private fun animateButton() {
         val scaleX = ObjectAnimator.ofFloat(btnLogin, "scaleX", 1f, 1.2f, 1f)
         val scaleY = ObjectAnimator.ofFloat(btnLogin, "scaleY", 1f, 1.2f, 1f)
@@ -115,10 +112,9 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // Animasi untuk progress bar
     private fun animateProgressBar() {
         val progressAnimator = ObjectAnimator.ofFloat(progressBar, "alpha", 0f, 1f)
-        progressAnimator.duration = 800 // Memperpanjang durasi transparansi untuk efek lebih halus
+        progressAnimator.duration = 800
         progressAnimator.start()
     }
 }

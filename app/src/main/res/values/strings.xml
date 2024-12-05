@@ -26,6 +26,8 @@
     <string name="unknown_time">Unknown Time\n</string>
     <string name="add_description">Add description</string>
     <string name="upload">Upload</string>
+    <string name="gallery">Gallery\n</string>
+    <string name="camera">Camera</string>
 
 
 </resources>

@@ -19,7 +19,6 @@ class UserRepository(
         emit(Result.failure(e))
     }
 
-
     fun login(email: String, password: String): Flow<Result<LoginResponse>> = flow {
         val response = apiService.login(email, password)
         emit(Result.success(response))

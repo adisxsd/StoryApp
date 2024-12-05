@@ -40,15 +40,23 @@ class MainActivity : AppCompatActivity() {
         userPreference = UserPreference(applicationContext)
         storyAdapter = StoryAdapter(listOf())
 
-        // Set up RecyclerView
+
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = storyAdapter
         }
+        binding.swipeRefreshLayout.isRefreshing = false
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+
+            lifecycleScope.launch {
+                refreshStoriesFromAPI()
+            }
+        }
 
         checkSession()
 
-        // Handle item click for RecyclerView
+
         storyAdapter.setOnItemClickListener { story ->
             Log.d("MainActivity", "Story clicked: ${story.id}")
             if (story.id != null) {
@@ -65,11 +73,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-
         setSupportActionBar(binding.toolbar)
 
         lifecycleScope.launch {
-            val token = userPreference.getToken().first() // Ambil token dari DataStore
+            val token = userPreference.getToken().first()
+            refreshStoriesFromAPI()
             token?.let {
                 storyViewModel.getStories(it).observe(this@MainActivity) { result ->
                     when (result) {
@@ -80,10 +88,7 @@ class MainActivity : AppCompatActivity() {
                             showLoading(false)
                             val stories = result.data
                             if (stories.isNotEmpty()) {
-                                // Update adapter dengan data baru
-                                storyAdapter.submitList(stories) // Jika menggunakan ListAdapter
-//                                 binding.recyclerView.adapter = storyAdapter
-//                                 storyAdapter.notifyDataSetChanged()
+                                storyAdapter.submitList(stories)
                             } else {
                                 showToast(this@MainActivity, "No stories available.")
                             }
@@ -102,6 +107,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private suspend fun refreshStoriesFromAPI() {
+        val token = userPreference.getToken().first()
+        token?.let {
+            storyViewModel.getStories(it).observe(this@MainActivity) { result ->
+                when (result) {
+                    is Result.Loading -> {
+                        showLoading(true)
+                    }
+                    is Result.Success -> {
+                        showLoading(false)
+                        binding.swipeRefreshLayout.isRefreshing = false
+                        val stories = result.data
+                        if (stories.isNotEmpty()) {
+                            val currentList = storyAdapter.currentList.toMutableList()
+                            currentList.addAll(stories)
+                            storyAdapter.submitList(currentList)
+                        } else {
+                            showToast(this@MainActivity, "No stories available.")
+                        }
+                    }
+                    is Result.Error -> {
+                        showLoading(false)
+                        binding.swipeRefreshLayout.isRefreshing = false
+                        showToast(this@MainActivity, "Error: ${result.exception.localizedMessage}")
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+
     private fun checkSession() {
         val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
         val isLoggedIn = sharedPreferences.getBoolean("is_logged_in", false)
@@ -113,10 +153,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-    }
-
-    private fun showLoading(isLoading: Boolean) {
-        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
 
     private fun performLogout() {
@@ -144,3 +180,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+

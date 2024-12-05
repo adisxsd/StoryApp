@@ -66,14 +66,13 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
     implementation ("androidx.fragment:fragment-ktx:1.8.5")
     implementation ("androidx.appcompat:appcompat:1.7.0")
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
 
 
     // glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-
-//    implementation ("com.github.yalantis:ucrop:2.2.8")
 
 
     // retrofit
