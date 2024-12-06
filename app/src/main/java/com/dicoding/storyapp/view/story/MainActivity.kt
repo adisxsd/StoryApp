@@ -15,9 +15,9 @@ import com.dicoding.storyapp.data.local.UserPreference
 import com.dicoding.storyapp.databinding.ActivityMainBinding
 import com.dicoding.storyapp.utils.Result
 import com.dicoding.storyapp.utils.showToast
+import com.dicoding.storyapp.view.addstory.AddStoryActivity
 import com.dicoding.storyapp.view.detailStory.DetailActivity
 import com.dicoding.storyapp.view.login.LoginActivity
-import com.dicoding.storyapp.view.addstory.AddStoryActivity
 import com.dicoding.storyapp.viewmodel.ViewModelFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -44,14 +44,6 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = storyAdapter
-        }
-        binding.swipeRefreshLayout.isRefreshing = false
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-
-            lifecycleScope.launch {
-                refreshStoriesFromAPI()
-            }
         }
 
         checkSession()
@@ -106,6 +98,49 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            val token = userPreference.getToken().first()
+            token?.let {
+                storyViewModel.getStories(it).observe(this@MainActivity) { result ->
+                    when (result) {
+                        is Result.Loading -> {
+                            showLoading(true)
+                        }
+                        is Result.Success -> {
+                            showLoading(false)
+                            val stories = result.data
+                            if (stories.isNotEmpty()) {
+                                val currentStories = storyAdapter.currentList.toMutableList()
+                                val newStory = stories.first() // Mengambil cerita terbaru
+                                currentStories.add(0, newStory) // Menambahkan cerita baru ke posisi pertama
+
+                                // Memperbarui adapter dengan daftar cerita baru
+                                storyAdapter.submitList(currentStories)
+
+                                // Scroll langsung ke cerita terbaru
+                                binding.recyclerView.smoothScrollToPosition(0)
+                            } else {
+                                showToast(this@MainActivity, "No stories available.")
+                            }
+                        }
+                        is Result.Error -> {
+                            showLoading(false)
+                            showToast(this@MainActivity, "Error: ${result.exception.localizedMessage}")
+                        }
+                    }
+                }
+            } ?: run {
+                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                startActivity(intent)
+                finish()
+            }
+        }
+    }
+
+
+
 
     private suspend fun refreshStoriesFromAPI() {
         val token = userPreference.getToken().first()
@@ -117,7 +152,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     is Result.Success -> {
                         showLoading(false)
-                        binding.swipeRefreshLayout.isRefreshing = false
                         val stories = result.data
                         if (stories.isNotEmpty()) {
                             val currentList = storyAdapter.currentList.toMutableList()
@@ -129,7 +163,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     is Result.Error -> {
                         showLoading(false)
-                        binding.swipeRefreshLayout.isRefreshing = false
                         showToast(this@MainActivity, "Error: ${result.exception.localizedMessage}")
                     }
                 }

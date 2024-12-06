@@ -4,7 +4,6 @@ import android.animation.ObjectAnimator
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -25,14 +24,12 @@ class DetailActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val storyDescriptionTextView = findViewById<TextView>(R.id.tv_detail_description)
-
-        val animationDescription = ObjectAnimator.ofFloat(storyDescriptionTextView, "translationY", 1000f, 0f)
-        animationDescription.duration = 1000
-        animationDescription.start()
-
         binding = StoryDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val animationDescription = ObjectAnimator.ofFloat(binding.tvDetailDescription, "translationY", 1000f, 0f)
+        animationDescription.duration = 1000
+        animationDescription.start()
 
         val storyId = intent.getStringExtra(EXTRA_STORY_ID)
         Log.d("DetailActivity", "Story ID: $storyId")
@@ -40,7 +37,6 @@ class DetailActivity : AppCompatActivity() {
         // Show loading progress bar
         binding.progressBar.visibility = View.VISIBLE
 
-        // Observasi data story detail
         storyDetailViewModel.storyDetail.observe(this, Observer { story ->
             if (story != null) {
                 showStoryDetail(story)
@@ -67,11 +63,9 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun showError() {
-
         binding.tvDetailName.text = getString(R.string.error_loading_story)
         binding.tvDetailDescription.text = ""
         binding.tvDetailCreatedAt.text = ""
-
 
         binding.progressBar.visibility = View.GONE
     }

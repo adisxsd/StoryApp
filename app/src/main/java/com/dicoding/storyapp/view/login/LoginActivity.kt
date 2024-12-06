@@ -46,18 +46,6 @@ class LoginActivity : AppCompatActivity() {
 
         animateProgressBar()
 
-        btnLogin.setOnClickListener {
-            val email = edEmail.text.toString()
-            val password = edPassword.text.toString()
-
-            if (email.isBlank() || password.isBlank()) {
-                Toast.makeText(this, "Email and Password cannot be empty", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            loginUser(email, password)
-        }
-
         tvSignUp.setOnClickListener {
             val intent = Intent(this@LoginActivity, RegisterActivity::class.java)
             startActivity(intent)
@@ -109,6 +97,15 @@ class LoginActivity : AppCompatActivity() {
         animatorSet.duration = 500
         btnLogin.setOnClickListener {
             animatorSet.start()
+            val email = edEmail.text.toString()
+            val password = edPassword.text.toString()
+
+            if (email.isBlank() || password.isBlank()) {
+                Toast.makeText(this, "Email and Password cannot be empty", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            loginUser(email, password)
         }
     }
 
