@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         lifecycleScope.launch {
             val token = userPreference.getToken().first()
+            refreshStoriesFromAPI()
             token?.let {
                 storyViewModel.getStories(it).observe(this@MainActivity) { result ->
                     when (result) {
@@ -112,15 +113,7 @@ class MainActivity : AppCompatActivity() {
                             showLoading(false)
                             val stories = result.data
                             if (stories.isNotEmpty()) {
-                                val currentStories = storyAdapter.currentList.toMutableList()
-                                val newStory = stories.first() // Mengambil cerita terbaru
-                                currentStories.add(0, newStory) // Menambahkan cerita baru ke posisi pertama
-
-                                // Memperbarui adapter dengan daftar cerita baru
-                                storyAdapter.submitList(currentStories)
-
-                                // Scroll langsung ke cerita terbaru
-                                binding.recyclerView.smoothScrollToPosition(0)
+                                storyAdapter.submitList(stories)
                             } else {
                                 showToast(this@MainActivity, "No stories available.")
                             }
