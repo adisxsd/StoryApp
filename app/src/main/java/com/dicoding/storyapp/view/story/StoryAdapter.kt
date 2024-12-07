@@ -1,6 +1,5 @@
 package com.dicoding.storyapp.view.story
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +12,7 @@ import com.bumptech.glide.Glide
 import com.dicoding.storyapp.R
 import com.dicoding.storyapp.data.model.ListStoryItem
 
-class StoryAdapter(listOf: List<Any>) : ListAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(StoryDiffCallback()) {
-
+class StoryAdapter : ListAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(StoryDiffCallback()) {
     private var onItemClickListener: ((ListStoryItem) -> Unit)? = null
 
     fun setOnItemClickListener(listener: (ListStoryItem) -> Unit) {
@@ -28,16 +26,11 @@ class StoryAdapter(listOf: List<Any>) : ListAdapter<ListStoryItem, StoryAdapter.
 
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
         val story = getItem(position)
-        story?.let {
-            holder.bind(it)
-            holder.itemView.setOnClickListener {
-                Log.d("StoryAdapter", "Item clicked at position $position")
-                onItemClickListener?.invoke(story)
-            }
+        holder.bind(story)
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.invoke(story)
         }
     }
-
-    override fun getItemCount(): Int = currentList.size
 
     class StoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val imageView: ImageView = itemView.findViewById(R.id.iv_item_photo)
@@ -47,7 +40,6 @@ class StoryAdapter(listOf: List<Any>) : ListAdapter<ListStoryItem, StoryAdapter.
         fun bind(story: ListStoryItem) {
             textName.text = story.name
             textDescription.text = story.description
-
             Glide.with(itemView.context)
                 .load(story.photoUrl)
                 .placeholder(R.drawable.baseline_image_24)

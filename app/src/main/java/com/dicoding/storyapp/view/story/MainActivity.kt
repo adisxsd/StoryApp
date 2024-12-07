@@ -36,19 +36,16 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         userPreference = UserPreference(applicationContext)
-        storyAdapter = StoryAdapter(listOf())
-
+        storyAdapter = StoryAdapter()
 
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = storyAdapter
         }
 
+        setSupportActionBar(binding.toolbar)
         checkSession()
-
-
         storyAdapter.setOnItemClickListener { story ->
             Log.d("MainActivity", "Story clicked: ${story.id}")
             if (story.id != null) {
@@ -64,130 +61,63 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this@MainActivity, AddStoryActivity::class.java)
             startActivity(intent)
         }
-
-        setSupportActionBar(binding.toolbar)
-
         lifecycleScope.launch {
             val token = userPreference.getToken().first()
-            refreshStoriesFromAPI()
-            token?.let {
-                storyViewModel.getStories(it).observe(this@MainActivity) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            showLoading(true)
-                        }
-                        is Result.Success -> {
-                            showLoading(false)
-                            val stories = result.data
-                            if (stories.isNotEmpty()) {
-                                storyAdapter.submitList(stories)
-                            } else {
-                                showToast(this@MainActivity, "No stories available.")
-                            }
-                        }
-                        is Result.Error -> {
-                            showLoading(false)
-                            showToast(this@MainActivity, "Error: ${result.exception.localizedMessage}")
-                        }
-                    }
-                }
-            } ?: run {
-                val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
+            token?.let { observeStories(it) } ?: redirectToLogin()
         }
     }
+
     override fun onResume() {
         super.onResume()
         lifecycleScope.launch {
             val token = userPreference.getToken().first()
-            refreshStoriesFromAPI()
-            token?.let {
-                storyViewModel.getStories(it).observe(this@MainActivity) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            showLoading(true)
-                        }
-                        is Result.Success -> {
-                            showLoading(false)
-                            val stories = result.data
-                            if (stories.isNotEmpty()) {
-                                storyAdapter.submitList(stories)
-                            } else {
-                                showToast(this@MainActivity, "No stories available.")
-                            }
-                        }
-                        is Result.Error -> {
-                            showLoading(false)
-                            showToast(this@MainActivity, "Error: ${result.exception.localizedMessage}")
-                        }
-                    }
-                }
-            } ?: run {
-                val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                startActivity(intent)
-                finish()
-            }
+            token?.let { observeStories(it) }
         }
     }
 
-
-
-
-    private suspend fun refreshStoriesFromAPI() {
-        val token = userPreference.getToken().first()
-        token?.let {
-            storyViewModel.getStories(it).observe(this@MainActivity) { result ->
-                when (result) {
-                    is Result.Loading -> {
-                        showLoading(true)
+    private fun observeStories(token: String) {
+        storyViewModel.getStories(token).observe(this) { result ->
+            when (result) {
+                is Result.Loading -> showLoading(true)
+                is Result.Success -> {
+                    showLoading(false)
+                    val stories = result.data.filterNotNull().distinctBy { it.id }
+                    if (stories.isNotEmpty()) {
+                        storyAdapter.submitList(stories)
+                        binding.recyclerView.scrollToPosition(0)
+                    } else {
+                        showToast(this, "No stories available.")
                     }
-                    is Result.Success -> {
-                        showLoading(false)
-                        val stories = result.data
-                        if (stories.isNotEmpty()) {
-                            val currentList = storyAdapter.currentList.toMutableList()
-                            currentList.addAll(stories)
-                            storyAdapter.submitList(currentList)
-                        } else {
-                            showToast(this@MainActivity, "No stories available.")
-                        }
-                    }
-                    is Result.Error -> {
-                        showLoading(false)
-                        showToast(this@MainActivity, "Error: ${result.exception.localizedMessage}")
-                    }
+                }
+                is Result.Error -> {
+                    showLoading(false)
+                    showToast(this, "Error: ${result.exception.localizedMessage}")
                 }
             }
         }
     }
-
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
-
     private fun checkSession() {
         val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
         val isLoggedIn = sharedPreferences.getBoolean("is_logged_in", false)
 
-        Log.d("MainActivity", "isLoggedIn: $isLoggedIn")
         if (!isLoggedIn) {
-            val intent = Intent(this@MainActivity, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            startActivity(intent)
-            finish()
+            redirectToLogin()
         }
     }
-
+    private fun redirectToLogin() {
+        val intent = Intent(this@MainActivity, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
     private fun performLogout() {
         lifecycleScope.launch {
             userPreference.clearToken()
-
-            val intent = Intent(this@MainActivity, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
+            redirectToLogin()
         }
     }
 
@@ -206,4 +136,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
