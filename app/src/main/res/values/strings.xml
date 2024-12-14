@@ -1,12 +1,12 @@
 <resources>
     <string name="app_name">StoryApp</string>
     <string name="selamat_datang">Welcome to StoryApp</string>
-    <string name="email" >Email</string>
-    <string name="masukkan_alamat_email" >Enter your email</string>
-    <string name="password" >Password</string>
-    <string name="enter_your_password" >Enter your password</string>
-    <string name="login" >Login</string>
-    <string name="daftar" >Didn\'t have an account? Sign Up</string>
+    <string name="email">Email</string>
+    <string name="masukkan_alamat_email">Enter your email</string>
+    <string name="password">Password</string>
+    <string name="enter_your_password">Enter your password</string>
+    <string name="login">Login</string>
+    <string name="daftar">Didn\'t have an account? Sign Up</string>
     <string name="enter_your_name">Enter your name</string>
     <string name="name">Name</string>
     <string name="HaveAccount">Already have an account? Login</string>
@@ -28,6 +28,7 @@
     <string name="upload">Upload</string>
     <string name="gallery">Gallery\n</string>
     <string name="camera">Camera</string>
+    <string name="title_activity_maps">MapsActivity</string>
 
 
 </resources>
