@@ -34,7 +34,6 @@ class DetailActivity : AppCompatActivity() {
         val storyId = intent.getStringExtra(EXTRA_STORY_ID)
         Log.d("DetailActivity", "Story ID: $storyId")
 
-        // Show loading progress bar
         binding.progressBar.visibility = View.VISIBLE
 
         storyDetailViewModel.storyDetail.observe(this, Observer { story ->

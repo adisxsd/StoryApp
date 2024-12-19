@@ -20,20 +20,17 @@ class AddStoryViewModel(
     private val _addStoryResponse = MutableLiveData<Result<AddStoryResponse>>()
     val addStoryResponse: LiveData<Result<AddStoryResponse>> get() = _addStoryResponse
 
-    fun uploadStory(description: String, photo: File) {
+    fun uploadStory(description: String, photo: File, lat: Double? = null, lon: Double? = null) {
         viewModelScope.launch {
             _addStoryResponse.postValue(Result.Loading)
 
             try {
                 val token = userRepository.getToken().first()
 
-                // Ensure token is not null or empty
                 if (token.isNullOrEmpty()) {
                     throw IllegalArgumentException("Token is missing")
                 }
-
-                val response = storyRepository.uploadStory(description, photo, "Bearer $token")
-
+                val response = storyRepository.uploadStory(description, photo, lat, lon, "Bearer $token")
                 _addStoryResponse.postValue(Result.Success(response))
 
             } catch (e: Exception) {
@@ -42,5 +39,6 @@ class AddStoryViewModel(
         }
     }
 }
+
 
 

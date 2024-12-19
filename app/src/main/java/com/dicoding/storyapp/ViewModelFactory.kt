@@ -3,13 +3,15 @@ package com.dicoding.storyapp.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.dicoding.storyapp.data.remote.ApiConfig
 import com.dicoding.storyapp.data.di.Injection
-import com.dicoding.storyapp.view.login.LoginViewModel
+import com.dicoding.storyapp.data.remote.ApiConfig
 import com.dicoding.storyapp.ui.loginregister.RegisterViewModel
 import com.dicoding.storyapp.view.addstory.AddStoryViewModel
-import com.dicoding.storyapp.view.story.StoryViewModel
 import com.dicoding.storyapp.view.detailStory.StoryDetailViewModel
+import com.dicoding.storyapp.view.login.LoginViewModel
+import com.dicoding.storyapp.view.maps.MapsViewModel
+import com.dicoding.storyapp.view.story.StoryPagingSource
+import com.dicoding.storyapp.view.story.StoryViewModel
 
 class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
 
@@ -22,7 +24,10 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
                 RegisterViewModel(Injection.provideRepository(context)) as T
             }
             modelClass.isAssignableFrom(StoryViewModel::class.java) -> {
-                StoryViewModel(Injection.provideStoryRepository(context)) as T
+                val token = getTokenFromSharedPreferences(context)
+                val storyRepository = Injection.provideStoryRepository(context)
+                val storyPagingSource = StoryPagingSource(storyRepository.apiService, token)
+                StoryViewModel(storyRepository, storyPagingSource) as T
             }
             modelClass.isAssignableFrom(StoryDetailViewModel::class.java) -> {
                 val apiService = ApiConfig.getApiService()
@@ -34,9 +39,20 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
                     userRepository = Injection.provideRepository(context)
                 ) as T
             }
-
+            modelClass.isAssignableFrom(MapsViewModel::class.java) -> {
+                MapsViewModel(
+                    storyRepository = Injection.provideStoryRepository(context),
+                    userRepository = Injection.provideRepository(context)
+                ) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
+    }
+
+    // Contoh fungsi untuk mengambil token dari SharedPreferences
+    private fun getTokenFromSharedPreferences(context: Context): String {
+        val sharedPref = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        return sharedPref.getString("user_token", "") ?: ""
     }
 
     companion object {
@@ -45,3 +61,4 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
         }
     }
 }
+

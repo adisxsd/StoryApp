@@ -50,48 +50,60 @@ android {
 }
 
 dependencies {
+    // Core Android
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0") // Jika diperlukan
+
+    // Lifecycle & ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.7")
+
+    // Fragment & Activity
     implementation("androidx.activity:activity-ktx:1.9.3")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.10")
-    implementation("androidx.activity:activity-ktx:1.9.3")
-    implementation("com.google.android.gms:play-services-fitness:21.2.0")
-    implementation("com.google.android.gms:play-services-maps:19.0.0")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
-    implementation ("androidx.fragment:fragment-ktx:1.8.5")
-    implementation ("androidx.appcompat:appcompat:1.7.0")
-    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("androidx.fragment:fragment-ktx:1.8.5")
 
+    // Paging
+    implementation("androidx.paging:paging-runtime-ktx:3.3.5")
+    testImplementation("androidx.paging:paging-common:3.3.5")
 
+    // Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-common:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
+    ksp("androidx.room:room-compiler:2.6.1")
 
-    // glide
-    implementation("com.github.bumptech.glide:glide:4.16.0")
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-
-
-    // retrofit
+    // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
-    // room
-    implementation("androidx.room:room-runtime:2.6.1")
-    implementation("androidx.room:room-common:2.6.1")
-    implementation("androidx.room:room-ktx:2.6.1")
-    ksp("androidx.room:room-compiler:2.6.1")
+    // Glide
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    implementation ("androidx.datastore:datastore-preferences:1.1.1")
+    // Gson
+    implementation("com.google.code.gson:gson:2.10.1")
 
-    implementation ("com.google.code.gson:gson:2.10.1")
+    // Google Play Services
+    implementation("com.google.android.gms:play-services-fitness:21.2.0")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
-
+    // Testing
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("org.mockito:mockito-core:5.12.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    testImplementation("androidx.paging:paging-common:3.3.5")
 
 }

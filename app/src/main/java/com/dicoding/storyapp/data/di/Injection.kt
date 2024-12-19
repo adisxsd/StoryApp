@@ -10,16 +10,15 @@ object Injection {
 
     fun provideRepository(context: Context): UserRepository {
         val pref = UserPreference(context)
-
         val apiService = ApiConfig.getApiService()
-
         return UserRepository(apiService, pref)
     }
 
     fun provideStoryRepository(context: Context): StoryRepository {
-        val userRepository = provideRepository(context)
+        val userPreference = UserPreference(context)  // Use UserPreference directly
         val apiService = ApiConfig.getApiService()
-        return StoryRepository(apiService)
+        return StoryRepository(apiService, userPreference)  // Provide both apiService and userPreference
     }
-
 }
+
+

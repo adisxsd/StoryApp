@@ -29,6 +29,9 @@
     <string name="gallery">Gallery\n</string>
     <string name="camera">Camera</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="maps">Story Maps\n</string>
+    <string name="location_not_set">Location Not Set\n</string>
+    <string name="use_current_location">Use Current Location</string>
 
 
 </resources>

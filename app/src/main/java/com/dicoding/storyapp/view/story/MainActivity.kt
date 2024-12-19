@@ -13,40 +13,32 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.storyapp.R
 import com.dicoding.storyapp.data.local.UserPreference
 import com.dicoding.storyapp.databinding.ActivityMainBinding
-import com.dicoding.storyapp.utils.Result
-import com.dicoding.storyapp.utils.showToast
 import com.dicoding.storyapp.view.addstory.AddStoryActivity
 import com.dicoding.storyapp.view.detailStory.DetailActivity
 import com.dicoding.storyapp.view.login.LoginActivity
+import com.dicoding.storyapp.view.maps.MapsActivity
 import com.dicoding.storyapp.viewmodel.ViewModelFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var userPreference: UserPreference
-    private lateinit var storyAdapter: StoryAdapter
+    private lateinit var storyAdapter: StoryPagingAdapter
     private val storyViewModel: StoryViewModel by viewModels {
         ViewModelFactory.getInstance(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         userPreference = UserPreference(applicationContext)
-        storyAdapter = StoryAdapter()
 
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = storyAdapter
-        }
-
-        setSupportActionBar(binding.toolbar)
-        checkSession()
-        storyAdapter.setOnItemClickListener { story ->
+        storyAdapter = StoryPagingAdapter { story ->
             Log.d("MainActivity", "Story clicked: ${story.id}")
             if (story.id != null) {
                 val intent = Intent(this@MainActivity, DetailActivity::class.java)
@@ -57,13 +49,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        binding.recyclerView.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = storyAdapter
+        }
+
+        setSupportActionBar(binding.toolbar)
+        checkSession()
+
         binding.fabAddStory.setOnClickListener {
             val intent = Intent(this@MainActivity, AddStoryActivity::class.java)
             startActivity(intent)
         }
+
         lifecycleScope.launch {
             val token = userPreference.getToken().first()
-            token?.let { observeStories(it) } ?: redirectToLogin()
+            Log.d("MainActivity", "Token: $token")
+            if (!token.isNullOrEmpty()) {
+                storyViewModel.getStories(token)
+                showLoading(true)
+                observeStories()
+            } else {
+                redirectToLogin()
+            }
         }
     }
 
@@ -71,49 +79,49 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         lifecycleScope.launch {
             val token = userPreference.getToken().first()
-            token?.let { observeStories(it) }
+            Log.d("MainActivity", "Token: $token")
+            if (!token.isNullOrEmpty()) {
+                storyViewModel.getStories(token)
+                showLoading(true)
+                observeStories()
+            } else {
+                redirectToLogin()
+            }
         }
     }
 
-    private fun observeStories(token: String) {
-        storyViewModel.getStories(token).observe(this) { result ->
-            when (result) {
-                is Result.Loading -> showLoading(true)
-                is Result.Success -> {
-                    showLoading(false)
-                    val stories = result.data.filterNotNull().distinctBy { it.id }
-                    if (stories.isNotEmpty()) {
-                        storyAdapter.submitList(stories)
-                        binding.recyclerView.scrollToPosition(0)
-                    } else {
-                        showToast(this, "No stories available.")
-                    }
-                }
-                is Result.Error -> {
-                    showLoading(false)
-                    showToast(this, "Error: ${result.exception.localizedMessage}")
-                }
-            }
+    private fun observeStories() {
+        storyViewModel.pagingData.observe(this) { pagingData ->
+            Log.d("MainActivity", "Paging data received: $pagingData")
+            storyAdapter.submitData(lifecycle, pagingData)
+            showLoading(false)
         }
     }
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
     }
+
     private fun checkSession() {
         val sharedPreferences = getSharedPreferences("user_session", MODE_PRIVATE)
         val isLoggedIn = sharedPreferences.getBoolean("is_logged_in", false)
-
         if (!isLoggedIn) {
             redirectToLogin()
         }
     }
+
     private fun redirectToLogin() {
         val intent = Intent(this@MainActivity, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
     }
+
+    private fun redirectToMaps() {
+        val intent = Intent(this@MainActivity, MapsActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun performLogout() {
         lifecycleScope.launch {
             userPreference.clearToken()
@@ -132,7 +140,15 @@ class MainActivity : AppCompatActivity() {
                 performLogout()
                 true
             }
+            R.id.action_maps -> {
+                redirectToMaps()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
 }
+
+
+
+

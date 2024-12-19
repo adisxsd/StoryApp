@@ -1,59 +1,63 @@
 package com.dicoding.storyapp.view.story
 
+import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dicoding.storyapp.R
 import com.dicoding.storyapp.data.model.ListStoryItem
+import com.dicoding.storyapp.databinding.ItemStoryBinding
 
-class StoryAdapter : ListAdapter<ListStoryItem, StoryAdapter.StoryViewHolder>(StoryDiffCallback()) {
-    private var onItemClickListener: ((ListStoryItem) -> Unit)? = null
+class StoryPagingAdapter(
+    private val onItemClickListener: (ListStoryItem) -> Unit
+) : PagingDataAdapter<ListStoryItem, StoryPagingAdapter.StoryViewHolder>(DIFF_CALLBACK) {
 
-    fun setOnItemClickListener(listener: (ListStoryItem) -> Unit) {
-        onItemClickListener = listener
+    companion object {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListStoryItem>() {
+            override fun areItemsTheSame(oldItem: ListStoryItem, newItem: ListStoryItem): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: ListStoryItem, newItem: ListStoryItem): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_story, parent, false)
-        return StoryViewHolder(view)
+        val binding = ItemStoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return StoryViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
         val story = getItem(position)
-        holder.bind(story)
-        holder.itemView.setOnClickListener {
-            onItemClickListener?.invoke(story)
+        if (story != null) {
+            Log.d("StoryPagingAdapter", "Binding story: ${story.name}")
+            holder.bind(story)
+            holder.itemView.setOnClickListener {
+                onItemClickListener(story)
+            }
         }
     }
 
-    class StoryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val imageView: ImageView = itemView.findViewById(R.id.iv_item_photo)
-        private val textName: TextView = itemView.findViewById(R.id.tv_item_name)
-        private val textDescription: TextView = itemView.findViewById(R.id.tv_item_description)
+
+    class StoryViewHolder(
+        private val binding: ItemStoryBinding
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(story: ListStoryItem) {
-            textName.text = story.name
-            textDescription.text = story.description
-            Glide.with(itemView.context)
-                .load(story.photoUrl)
-                .placeholder(R.drawable.baseline_image_24)
-                .into(imageView)
-        }
-    }
-
-    class StoryDiffCallback : DiffUtil.ItemCallback<ListStoryItem>() {
-        override fun areItemsTheSame(oldItem: ListStoryItem, newItem: ListStoryItem): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: ListStoryItem, newItem: ListStoryItem): Boolean {
-            return oldItem == newItem
+            binding.apply {
+                tvItemName.text = story.name
+                tvItemDescription.text = story.description
+                Glide.with(itemView.context)
+                    .load(story.photoUrl)
+                    .placeholder(R.drawable.baseline_image_24)
+                    .error(R.drawable.image_error)
+                    .into(ivItemPhoto)
+            }
         }
     }
 }

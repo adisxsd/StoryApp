@@ -10,6 +10,12 @@ data class AddStoryResponse(
     @field:SerializedName("message")
     val message: String? = null,
 
+    @field:SerializedName("lon")
+    val lon: Any? = null,
+
+    @field:SerializedName("lat")
+    val lat: Any? = null,
+
     @field:SerializedName("story")
     val story: Story? = null
 )
